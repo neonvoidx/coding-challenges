@@ -1,13 +1,13 @@
 use std::{
     fs::File,
-    io::{BufReader, Error, Read},
+    io::{BufReader, Error, Read, stdin},
     path::PathBuf,
 };
 
 use clap::Parser;
 
 #[derive(Parser)]
-#[command(version, about, long_about = None, arg_required_else_help=true)]
+#[command(version, about, long_about = None)]
 struct Cli {
     #[arg(short = 'c', long = "bytes")]
     bytes: bool,
@@ -18,7 +18,7 @@ struct Cli {
     #[arg(short = 'w', long = "words")]
     words: bool,
 
-    file: PathBuf,
+    file: Option<PathBuf>,
 }
 
 fn main() -> Result<(), Error> {
@@ -26,21 +26,25 @@ fn main() -> Result<(), Error> {
     let bytes_flag: bool = cli.bytes;
     let lines_flag: bool = cli.lines;
     let words_flag: bool = cli.words;
-    let file: &PathBuf = &cli.file;
 
-    let f = File::open(file)?;
-    let mut f = BufReader::new(f);
+    let file_path = cli.file;
+    // If no file given, read from stdin
+    // we can box the Read because both stdin and file
+    // give Read types (though not the same)
+    let mut reader: Box<dyn Read> = match &file_path {
+        Some(path) => Box::new(File::open(path)?),
+        None => Box::new(stdin()),
+    };
 
     let mut line_count: usize = 0;
     let mut word_count: usize = 0;
     let mut bytes_count: usize = 0;
-    let mut char_count: usize = 0;
     let mut in_word = false;
     let mut buf = [0_u8; 8192];
 
     loop {
         // read bytes into buffer, and get number of bytes read
-        let read = f.read(&mut buf)?;
+        let read = reader.read(&mut buf)?;
         // done reading bytes?
         if read == 0 {
             break;
@@ -81,7 +85,11 @@ fn main() -> Result<(), Error> {
     if print_default || bytes_flag {
         print!("{}\t", bytes_count);
     }
-    println!("{}", file.display());
+
+    match &file_path {
+        Some(path) => println!("{}", path.display()),
+        None => println!(),
+    }
 
     Ok(())
 }
