@@ -1,8 +1,8 @@
-import http.server
-import socketserver
 import argparse
+import http.server
 import multiprocessing
 import signal
+import socketserver
 import sys
 
 BASE_PORT = 8000
@@ -15,12 +15,14 @@ def serve(port):
     Handler.log_message = lambda *args: None  # suppress per-request logs
     socketserver.TCPServer.allow_reuse_address = True
     with socketserver.TCPServer(("", port), Handler) as httpd:
-        print(f"Serving at http://localhost:{port}", flush=True)
+        print(f"Serving at http://127.0.0.1:{port}", flush=True)
         httpd.serve_forever()
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Spin up N HTTP servers serving index.html")
+    parser = argparse.ArgumentParser(
+        description="Spin up N HTTP servers serving index.html"
+    )
     parser.add_argument("count", type=int, help="Number of HTTP servers to start")
     args = parser.parse_args()
 
@@ -50,4 +52,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

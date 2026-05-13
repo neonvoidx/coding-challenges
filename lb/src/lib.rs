@@ -73,12 +73,9 @@ impl Worker {
 
                 match message {
                     Ok(job) => {
-                        println!("Worker {id} got a job; executing.");
-
                         job();
                     }
                     Err(_) => {
-                        println!("Worker {id} disconnected; shutting down.");
                         break;
                     }
                 }
@@ -95,12 +92,12 @@ pub enum Health {
     Dead,
 }
 pub struct Server {
-    address: Ipv4Addr,
-    port: usize,
-    health: Option<Health>,
+    pub address: Ipv4Addr,
+    pub port: u16,
+    pub health: Option<Health>,
 }
 impl Server {
-    pub fn new(address: Ipv4Addr, port: usize) -> Server {
+    pub fn new(address: Ipv4Addr, port: u16) -> Server {
         Server {
             address,
             port,
