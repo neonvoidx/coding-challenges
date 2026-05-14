@@ -1,2 +1,5 @@
 **/.direnv
 **/target
+/zig/irc/.zig-cache
+/zig/irc/.zig-cache
+/zig/irc/zig-out/bin

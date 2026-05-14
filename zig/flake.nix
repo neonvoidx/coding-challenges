@@ -1,7 +1,7 @@
 {
   description = "A Nix-flake-based Zig development environment";
 
-  inputs.nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0"; # stable Nixpkgs
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs?ref=nixos-unstable";
 
   outputs =
     { self, ... }@inputs:
@@ -29,9 +29,7 @@
           default = pkgs.mkShellNoCC {
             packages = with pkgs; [
               zig
-              (zls.overrideAttrs (old: {
-                patchPhase = ""; # Skip broken patchPhase
-              }))
+              zls
               lldb
             ];
           };
